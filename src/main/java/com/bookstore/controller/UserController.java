@@ -33,6 +33,7 @@ public class UserController {
 	@Autowired
 	private IUserService userService;
 	
+	//Returns all the users present
 	@GetMapping("getallusers")
 	public ResponseEntity<List<?>> getAllUsers(@RequestHeader String token) {
 		log.info("Get All User Data");
@@ -40,12 +41,14 @@ public class UserController {
 		return new ResponseEntity<List<?>>(response, HttpStatus.OK);
 	}
 	
+	//Sends an OTP to the user's mail
 	@GetMapping("/sendOTP/{token}")
 	public ResponseEntity<Response> sendOTP(@PathVariable String token){
 		Response userEntity = userService.sendOTP(token);
 		return new ResponseEntity<Response>(userEntity,HttpStatus.OK);
 	}
 	
+	//Verifies the OTP received by user
 	@GetMapping("/verifyOTP")
 	public ResponseEntity<Response> verifyOTP(@RequestHeader String token,
 											  @RequestParam int otp){
@@ -53,24 +56,28 @@ public class UserController {
 		return new ResponseEntity<Response>(userEntity,HttpStatus.OK);
 	}
 	
+	//Verifies the existence of user
 	@GetMapping("/verify/{token}")
 	public ResponseEntity<Response> verifyUser(@PathVariable String token){
 		Response userEntity = userService.verifyUser(token);
 		return new ResponseEntity<Response>(userEntity,HttpStatus.OK);
 	}
 		
+	//Verifies user based on userId 
 	@GetMapping("/verifyuserid/{userId}")
 	public boolean verifyUserId(@PathVariable int userId){
 		boolean userCheck = userService.verifyUserId(userId);
 		return userCheck;
 	}
 	
+	//Sets up an reminder check for subscription
 	@GetMapping("/subsremindercheck")
 	public ResponseEntity<Response> subsReminderCheck(@RequestHeader String token){
 		Response userEntity = userService.subsReminderCheck(token);
 		return new ResponseEntity<Response>(userEntity,HttpStatus.OK);
 	}
 	
+	//Creates a new user data
 	@PostMapping("/create")
 	public ResponseEntity<Response> addUserData(@Valid @RequestBody UserDTO userDTO) {
 		log.info("Create User Data : " + userDTO);
@@ -78,6 +85,7 @@ public class UserController {
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
 	
+	//Updates an existing user data
 	@PutMapping("/update")
 	public ResponseEntity<Response> updateUserData(@RequestHeader String token,
 			                                       @Valid @RequestBody UserDTO userDTO) {
@@ -86,6 +94,7 @@ public class UserController {
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
 	
+	//Updates the user subscription
 	@PutMapping("/updatesubscription")
 	public ResponseEntity<Response> updateSubscription(@RequestHeader String token) {
 		log.info("Update Subscription");
@@ -93,6 +102,7 @@ public class UserController {
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
 	
+	//User Login
 	@PutMapping("/login")
 	public ResponseEntity<Response> userLogin(@RequestHeader String token,
 											  @RequestParam String emailId,
@@ -102,6 +112,7 @@ public class UserController {
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
 	
+	//Forget Password
 	@PutMapping("/forgotpassword")
 	public ResponseEntity<Response> forgotPassword(@RequestHeader String token,
 											  	   @RequestParam String emailId) {
@@ -110,6 +121,7 @@ public class UserController {
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
 	
+	//Changes the user password
 	@PutMapping("/changepassword")
 	public ResponseEntity<Response> changePassword(@RequestHeader String token,
 											  	   @RequestParam String emailId,
@@ -119,6 +131,7 @@ public class UserController {
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
 	
+	//Deletes an existing user data
 	@DeleteMapping("/delete")
 	public ResponseEntity<Response> deleteUserData(@RequestHeader String token) {
 		log.info("User Data Deleted");
