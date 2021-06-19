@@ -35,6 +35,7 @@ public @Data class UserData {
 	private LocalDateTime purchaseDate;
 	private LocalDateTime expireDate;
 	private boolean subscribe = false;
+	private boolean passwordCheck = false;
 	
 	public UserData() {}
 	

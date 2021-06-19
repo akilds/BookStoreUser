@@ -53,7 +53,8 @@ public class UserService implements IUserService{
 			throw new UserException(400, "User Token Is Not Valid");
 		}	
 	}
-	
+
+	//Checks for subscription reminder
 	@Override
 	public Response subsReminderCheck(String token) {
 		int id = tokenUtil.decodeToken(token);
@@ -98,6 +99,7 @@ public class UserService implements IUserService{
 		}	
 	}
 
+	//Sends an OTP to user
 	@Override
 	public Response sendOTP(String token) {
 		int id = tokenUtil.decodeToken(token);
@@ -119,6 +121,7 @@ public class UserService implements IUserService{
 		}
 	}
 	
+	//Verifies the OTP received by user
 	@Override
 	public Response verifyOTP(String token, int otp) {
 		int id = tokenUtil.decodeToken(token);
@@ -140,7 +143,32 @@ public class UserService implements IUserService{
 		}
 	}
 	
-	//Updates an existing user data
+	//Verifies the existence of user
+	@Override
+	public Response verifyUser(String token) {
+		int id = tokenUtil.decodeToken(token);
+		Optional<UserData> isPresent = userRepository.findById(id);
+		if(isPresent.isPresent()) {
+			log.debug("User: " + isPresent.get() + " Verified!");
+			isPresent.get().setPasswordCheck(true);
+			userRepository.save(isPresent.get());
+			return new Response(200, "User Verified successfully!", token);
+		}
+		else {
+			log.error("User Token Is Not valid");
+			throw new UserException(400, "User Token Is Not Valid");
+		}
+	}
+	
+	
+	//Updates an existing user data//Verifies a user based on userId
+	@Override
+	public boolean verifyUserId(int userId) {
+		List<UserData> users = userRepository.findAll();
+		return users.stream().anyMatch(user -> user.getUserId()==userId);
+	}
+	
+	//Updates an existing user
 	@Override
 	public Response updateUser(String token, UserDTO userDTO) {
 		int id = tokenUtil.decodeToken(token);
@@ -156,6 +184,7 @@ public class UserService implements IUserService{
 		}	
 	}
 
+	//Updates user subscription
 	@Override
 	public Response updateSubscription(String token) {
 		int id = tokenUtil.decodeToken(token);
@@ -172,6 +201,66 @@ public class UserService implements IUserService{
 				isPresent.get().setExpireDate(today.plusYears(1));
 				userRepository.save(isPresent.get());
 				return new Response(200, "User Subscribed Successfully", token);
+			}
+		}else {
+			log.error("User Doesnt Exist");
+			throw new UserException(400, "User Doesnt Exist");
+		}	
+	}
+	
+	//User Login
+	@Override
+	public Response userLogin(String token, String emailId, String password) {
+		int id = tokenUtil.decodeToken(token);
+		Optional<UserData> isPresent = userRepository.findById(id);
+		if(isPresent.isPresent()) {
+			if(isPresent.get().getEmailId().equals(emailId)&&isPresent.get().getPassword().equals(password)) {
+				return new Response(200, "User Logged In Successfully", token);
+			}else {
+				log.error("Incorrect EmailId or Password");
+				throw new UserException(400, "Incorrect EmailId or Password");
+			}
+		}else {
+			log.error("User Doesnt Exist");
+			throw new UserException(400, "User Doesnt Exist");
+		}	
+	}
+	
+	//Forget Password
+	@Override
+	public Response forgotPassword(String token, String emailId) {
+		int id = tokenUtil.decodeToken(token);
+		Optional<UserData> isPresent = userRepository.findById(id);
+		if(isPresent.isPresent()) {
+			if(isPresent.get().getEmailId().equals(emailId)) {
+				String text = "Please click on the below link to to receive otp : \n http://localhost:8080/user/verify/"+token;
+				String subject = "Mail Validation";
+				email.sendMail(emailId,subject,text);
+				return new Response(200, "Verification Mail Sent Successfully", token);
+			}else {
+				log.error("InValid EmailId");
+				throw new UserException(400, "InValid EmailId");
+			}
+		}else {
+			log.error("User Doesnt Exist");
+			throw new UserException(400, "User Doesnt Exist");
+		}	
+	}
+	
+	//Change Password
+	@Override
+	public Response changePassword(String token, String emailId, String password) {
+		int id = tokenUtil.decodeToken(token);
+		Optional<UserData> isPresent = userRepository.findById(id);
+		if(isPresent.isPresent()) {
+			if(isPresent.get().getEmailId().equals(emailId)&&isPresent.get().isPasswordCheck()==true) {
+				isPresent.get().setPassword(password);
+				isPresent.get().setPasswordCheck(false);
+				userRepository.save(isPresent.get());
+				return new Response(200, "Password Changed Successfully", token);
+			}else {
+				log.error("InValid EmailId");
+				throw new UserException(400, "InValid EmailId");
 			}
 		}else {
 			log.error("User Doesnt Exist");

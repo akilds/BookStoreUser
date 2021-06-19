@@ -26,4 +26,14 @@ public interface IUserService {
 
 	Response subsReminderCheck(String token);
 
+	Response userLogin(String token, String emailId, String password);
+
+	Response forgotPassword(String token, String emailId);
+
+	Response verifyUser(String token);
+
+	Response changePassword(String token, String emailId, String password);
+
+	boolean verifyUserId(int userId);
+
 }

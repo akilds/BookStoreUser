@@ -53,6 +53,18 @@ public class UserController {
 		return new ResponseEntity<Response>(userEntity,HttpStatus.OK);
 	}
 	
+	@GetMapping("/verify/{token}")
+	public ResponseEntity<Response> verifyUser(@PathVariable String token){
+		Response userEntity = userService.verifyUser(token);
+		return new ResponseEntity<Response>(userEntity,HttpStatus.OK);
+	}
+		
+	@GetMapping("/verifyuserid/{userId}")
+	public boolean verifyUserId(@PathVariable int userId){
+		boolean userCheck = userService.verifyUserId(userId);
+		return userCheck;
+	}
+	
 	@GetMapping("/subsremindercheck")
 	public ResponseEntity<Response> subsReminderCheck(@RequestHeader String token){
 		Response userEntity = userService.subsReminderCheck(token);
@@ -78,6 +90,32 @@ public class UserController {
 	public ResponseEntity<Response> updateSubscription(@RequestHeader String token) {
 		log.info("Update Subscription");
 		Response response  = userService.updateSubscription(token);
+		return new ResponseEntity<Response>(response, HttpStatus.OK);
+	}
+	
+	@PutMapping("/login")
+	public ResponseEntity<Response> userLogin(@RequestHeader String token,
+											  @RequestParam String emailId,
+											  @RequestParam String password) {
+		log.info("User Login");
+		Response response  = userService.userLogin(token,emailId,password);
+		return new ResponseEntity<Response>(response, HttpStatus.OK);
+	}
+	
+	@PutMapping("/forgotpassword")
+	public ResponseEntity<Response> forgotPassword(@RequestHeader String token,
+											  	   @RequestParam String emailId) {
+		log.info("Forgot Password");
+		Response response  = userService.forgotPassword(token,emailId);
+		return new ResponseEntity<Response>(response, HttpStatus.OK);
+	}
+	
+	@PutMapping("/changepassword")
+	public ResponseEntity<Response> changePassword(@RequestHeader String token,
+											  	   @RequestParam String emailId,
+											  	   @RequestParam String password) {
+		log.info("Forgot Password");
+		Response response  = userService.changePassword(token,emailId,password);
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
 	
